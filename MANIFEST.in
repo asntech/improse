@@ -1,0 +1,2 @@
+include README.rst
+include improse/data/*.csv

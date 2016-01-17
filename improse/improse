@@ -1,0 +1,541 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Improse - Integrated Methods for Prediction of Super-Enhancers
+Created on Sun Oct 05 18:33:53 2014
+Version: 1.0
+@author: Aziz Khan
+"""
+import sys
+import os
+import pkgutil
+from string import upper,lower,join
+import numpy as np
+from scipy import interp
+import matplotlib
+matplotlib.use('Agg')
+import pylab as pl
+import pandas as pd
+from sklearn.metrics import roc_curve, auc, precision_recall_curve
+from sklearn.cross_validation import StratifiedKFold
+from sklearn.preprocessing import Imputer
+import datetime
+import improse
+from optparse import OptionParser
+
+#import warnings
+#warnings.filterwarnings('ignore')
+
+
+def get_data(feature_comb, sampling = None, feature_set = 'all'):
+    '''
+    Get the training data.
+    '''
+    
+    data_path = os.path.dirname(improse.__file__)
+    
+    #downsample negative cases - there are many more negatives than positives
+    if sampling == 'down':
+        #data_file = data_path+"/data/original_data.csv"
+        data_file = "/Users/azizkhan/projects/python/improse/improse/data/original_data.csv" 
+        train_df = pd.read_csv(data_file)
+
+        indices = np.where(train_df.Class == 'TE')[0]
+        rng = np.random.RandomState(13)
+        rng.shuffle(indices)
+        n_pos = (train_df.Class == 'SE').sum()
+        train_df = train_df.drop(train_df.index[indices[n_pos:]])
+    else:
+        #data_file = data_path+"/data/train_data.csv"
+        data_file = "/Users/azizkhan/projects/python/improse/improse/data/train_data.csv" 
+        train_df = pd.read_csv(data_file)
+
+    if feature_comb == "genomic" or feature_comb[0] == "genomic":
+        X = train_df[["pGC","pAT", "repeat_fraction","length","phastCons"]].values
+
+    elif feature_comb == "chromatin" or feature_comb[0] == "chromatin":
+        X = train_df[["Brd4","Cdk8","Cdk9","Med12","p300","CBP","Pol2","Lsd1","Brg1","Smc1","Nipbl","Mi2b","CHD7","HDAC2","HDAC","DnaseI"]].values
+    
+    elif feature_comb == "hms" or feature_comb[0] == "hms":
+        X = train_df[["H3K27ac","H3K4me1","H3K4me3","H3K9me3"]].values
+    
+    elif feature_comb == "tf" or feature_comb[0] == "tf":
+        X = train_df[["Oct4","Sox2","Nanog","Smad3","Stat3","Tcf3","","Klf4","Prdm14","Tcfcp2I1","Nr5a2"]].values
+ 
+    #H3K27ac, Brd4, Cdk8, Cdk9, p300, Med12
+    elif feature_comb == "top6" or feature_comb[0] == "top6":
+        X = train_df["H3K27ac","Brd4","Cdk8","Cdk9","p300","Med12"]
+    
+    #motif
+    elif feature_comb == "motif":
+        #X = train_df[["Esrrb","Klf4", "Smad3","H3K27ac","H3K4me1", "Brd4"]].values
+        X = np.genfromtxt(data_file, delimiter=',', usecols=(1,2,3,4,5,6,7,8,9,10,11,12,13,14),skip_header= 1)
+    #all data
+    elif feature_comb == "all" or feature_comb[0] == "all":
+        X = train_df[["pGC","pAT", "repeat_fraction","length","phastCons","H3K27ac","H3K4me1","H3K4me3","H3K9me3","Oct4","Sox2","Nanog","Smad3","Stat3","Tcf3","","Klf4","Prdm14","Tcfcp2I1","Nr5a2","Brd4","Cdk8","Cdk9","Med12","p300","CBP","Pol2","Lsd1","Brg1","Smc1","Nipbl","Mi2b","CHD7","HDAC2","HDAC","DnaseI"]].values
+        #X = np.genfromtxt(data_file, delimiter=',', usecols=(5,6,7,8,9,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,44,45,46,47,48,49), skip_header= 1)
+    else:
+        if isinstance(feature_comb, basestring):
+            features = []
+            features.append(feature_comb)
+            features.append(feature_comb)
+
+            X = train_df[features].values
+        else:
+            X = train_df[feature_comb].values
+    
+    imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
+    imp.fit(X)
+
+    #X.reshape(-1, 1)
+    target = train_df["Class"].values
+
+    #print X
+    #print len(target)
+    #exit()
+    y = np.zeros(len(X))
+    y[target == 'SE'] = 1
+    y[target == 'TE'] = 0
+    
+    return X, y
+
+
+def create_dir(dir_path):
+
+    if not os.path.exists(dir_path):
+        try:
+            os.makedirs(dir_path)
+        except:
+            sys.exit( "Output directory (%s) could not be created." % dir_path )
+    return dir_path
+
+#get model     
+def get_model(model='rf'):
+    '''
+    Get the model from six stat-of-the-art machine learning models.
+    '''
+    if model=='svm':
+        from sklearn.svm import SVC
+        names = ["Linear SVM"]
+        classifiers = [
+        SVC(kernel='linear', probability=True)    
+        ]
+    elif model=='ab':
+        from sklearn.ensemble import AdaBoostClassifier
+        names = ["AdaBoost"]
+        classifiers = [
+        AdaBoostClassifier() 
+        ]
+    elif model=='knn':
+        from sklearn.neighbors import KNeighborsClassifier
+        names = ["K-Nearest Neighbors"]
+        classifiers = [
+        KNeighborsClassifier(4)
+        ]
+    elif model=='dt':
+        from sklearn.tree import DecisionTreeClassifier
+        names = ["Decision Tree"]
+        classifiers = [
+        DecisionTreeClassifier(max_depth=3)   
+        ]
+    elif model=='nb':
+        from sklearn.naive_bayes import GaussianNB
+        names = ["Naive Bayes"]
+        classifiers = [
+         GaussianNB()   
+        ]
+    
+    elif model == 'all':
+        
+        from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+        from sklearn.naive_bayes import GaussianNB
+        from sklearn.neighbors import KNeighborsClassifier
+        from sklearn.tree import DecisionTreeClassifier
+        from sklearn.svm import SVC    
+        
+        names = ["Random Forest", "Linear SVM", "AdaBoost", "K-Nearest Neighbors", "Naive Bayes", "Decision Tree"]
+        classifiers = [
+        RandomForestClassifier(max_depth=5, n_estimators=20),
+        SVC(kernel='linear', probability=True),  
+        AdaBoostClassifier(),
+        KNeighborsClassifier(4),
+        GaussianNB(),
+        DecisionTreeClassifier(max_depth=3)]
+    else:
+        from sklearn.ensemble import RandomForestClassifier
+        names = ["Random Forest"]
+        classifiers = [
+        RandomForestClassifier(max_depth=5, n_estimators=20)
+        ]
+    
+    return names, classifiers
+
+# Classification and ROC analysis
+def claf_roc(X,y, Clabel, classifier, count, feature_comb, options):
+    '''
+    Train the model and test it using CV and draw the ROC plot.
+    '''
+    X, y = X[y != 2], y[y != 2]
+    n_samples, n_features = X.shape
+    
+    # Run classifier with cross-validation and plot ROC curves
+    cv = StratifiedKFold(y, n_folds=options.cv)
+    mean_precision = []
+    mean_recall = []
+    mean_prc = []
+    mean_tpr = 0.0
+    mean_fpr = np.linspace(0, 1, 100)
+    #all_tpr = []
+   
+    if options.test:
+        test_df = pd.read_csv(options.input)
+        imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
+        test_X = test_df[feature_comb].values
+
+        test_yy = test_df["Class"].values
+
+        test_y = np.zeros(len(test_X))
+        test_y[test_yy == 'SE'] = 1
+        test_y[test_yy == 'TE'] = 0
+
+        #imp.fit(test_X)
+        #imp.transform(test_X)
+        
+        print "Testing the model using feature set "+Clabel
+        probas_ = classifier.fit(X, y).predict_proba(test_X)
+        #clr.predict_proba(X_test)[:, 1]
+ 
+       # Compute ROC curve and area the curve
+        #print report1
+        fpr, tpr, thresholds = roc_curve(test_y, probas_[:, 1])
+        mean_tpr += interp(mean_fpr, fpr, tpr)
+        mean_tpr[0] = 0.0
+        #roc_auc = auc(fpr, tpr)
+        # Compute Precision-Recall and plot curve
+        precision, recall, thresh = precision_recall_curve(test_y, probas_[:, 1])
+        mean_precision.append(np.mean(precision))
+        mean_recall.append(np.mean(recall))
+        area = auc(recall, precision)
+        mean_prc.append(area)
+
+        #mean_tpr /= len(cv)
+        mean_tpr[-1] = 1.0
+        mean_auc = auc(mean_fpr, mean_tpr)
+        pl.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), lw=0.5) #good luck line
+
+    else:
+
+        for i, (train, test) in enumerate(cv):
+            
+            print "Fold-"+str(i+1)+" for feature set "+Clabel
+            probas_ = classifier.fit(X[train], y[train]).predict_proba(X[test])
+            #clr.predict_proba(X_test)[:, 1]
+     
+           # Compute ROC curve and area the curve
+            #print report1
+            fpr, tpr, thresholds = roc_curve(y[test], probas_[:, 1])
+            mean_tpr += interp(mean_fpr, fpr, tpr)
+            mean_tpr[0] = 0.0
+            #roc_auc = auc(fpr, tpr)
+            # Compute Precision-Recall and plot curve
+            precision, recall, thresh = precision_recall_curve(y[test], probas_[:, 1])
+            mean_precision.append(np.mean(precision))
+            mean_recall.append(np.mean(recall))
+            area = auc(recall, precision)
+            mean_prc.append(area)
+            #pl.plot(fpr, tpr, lw=2, label= Clabel +' = %0.2f' % roc_auc)
+
+        mean_tpr /= len(cv)
+        mean_tpr[-1] = 1.0
+        mean_auc = auc(mean_fpr, mean_tpr)
+        pl.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), lw=0.5) #good luck line
+
+    #if type[Clabel] is list:
+    #if not isinstance(Clabel, str):
+    #    Clabel = str(Clabel)
+    
+    if count > 7:
+        pl.plot(mean_fpr, mean_tpr, '--', label= Clabel +' (%0.2f)' % mean_auc, lw=1.0)
+    else:
+        pl.plot(mean_fpr, mean_tpr, label= Clabel +' (%0.2f)' % mean_auc, lw=1.0)
+       
+    return mean_auc, np.mean(mean_recall), np.mean(mean_precision), np.mean(mean_prc)
+
+def run_test(feature_list,classifiers,names,output_dir, options, sampling, feature_compare=False):
+    '''
+    Run on the training data and test the models using 10-fold cross-validation or test set.
+    '''
+    file_name = str(output_dir)+"/Improse_results.txt"
+    file_out_stat = open(file_name,'w')
+    out_string =  "These results are generated using Improse version 1.0 on "+str(datetime.datetime.now())+"\nRead more about Improse at https://github.com/asntech/improse\n"
+    file_out_stat.write(out_string)
+    
+    for name, clf in zip(names, classifiers):
+
+        clf_name = name
+        if options.test:
+            print "\nTraining "+clf_name
+        else:
+            print "\nRunning "+clf_name+" with "+str(options.cv)+"-fold cross-validation..."
+        roc_score = []
+        recall = []
+        precision = []
+        pr_curve = []
+        f1_score = []
+        
+        count = 1
+        if options.test:
+            out_string =  "\n\n"+clf_name+" with validation using test data "+options.input+"\n"
+        else:
+            out_string =  "\n\n"+clf_name+" with "+str(options.cv)+"-fold cross-validation\n"
+        file_out_stat.write(out_string)
+
+        out_string = "\t".join(['Features', 'Precision',"Recall", "F1-score", "AUC", "PRC"]) + "\n"
+        file_out_stat.write(out_string)
+
+        if feature_compare:
+            for feature_comb in feature_list:
+                X, y = get_data(feature_comb, sampling, options.feature)
+                #X = recursive_feature_selection(X,y)
+                 #get roc, precision, recall....
+                features_lable = '+'.join(feature_comb)
+
+                roc, rc, pr, prc = claf_roc(X,y, features_lable, clf, count, feature_comb, options)
+                
+                roc_score.append(np.round(roc,2))
+                recall.append(np.round(rc,2))
+                precision.append(np.round(pr,2))
+                pr_curve.append(np.round(prc,2))
+                
+                f1s = 2*((pr*rc) / (pr+rc))
+                f1_score.append(np.round(f1s,2))
+                #pl.grid(linestyle='--', lw=0.04)
+               #draw ROC CURVE
+                out_string = "\t".join([str(features_lable),str(float(np.round(pr,2))), str(float(np.round(rc,2))), str(float(np.round(f1s,2))), str(float(np.round(roc,2))),  str(float(np.round(prc,2)))]) + "\n"
+                file_out_stat.write(out_string)
+                count = count+1
+        
+        else:
+            
+            #if list contains another list
+            if any(isinstance(el, list) for el in feature_list):
+                feature_list = sum(feature_list, [])
+        
+            features_lable = '+'.join(feature_list)
+            #features_lable = "Features"
+
+            X, y = get_data(feature_list, sampling, options.feature)
+            
+            #get roc, precision, recall....
+            roc, rc, pr, prc = claf_roc(X,y, features_lable, clf, count,feature_list, options)
+            
+            roc_score.append(np.round(roc,2))
+            recall.append(np.round(rc,2))
+            precision.append(np.round(pr,2))
+            pr_curve.append(np.round(prc,2))
+            
+            f1s = 2*((pr*rc) / (pr+rc))
+            f1_score.append(np.round(f1s,2))
+            #pl.grid(linestyle='--', lw=0.04)
+            #draw ROC CURVE
+            out_string = "\t".join([features_lable,str(float(np.round(pr,2))), str(float(np.round(rc,2))), str(float(np.round(f1s,2))), str(float(np.round(roc,2))),  str(float(np.round(prc,2)))]) + "\n"
+            file_out_stat.write(out_string)
+            count = count+1
+
+        pl.xlim([0.0, 1.0])
+        pl.ylim([0.0, 1.0])
+        pl.xlabel('False Positive Rate (1-Specificity)')
+        pl.ylabel('True Positive Rate (Sensitivity)')
+        
+        #pl.title('ROC - Receiver Operating Characteristic')
+        pl.title("ROC - "+clf_name)
+        pl.legend(fancybox=True,frameon=False, fontsize='medium', loc="lower right",)
+
+        #Save figure
+        if options.figuretype:
+            pl.savefig(str(output_dir)+"/"+clf_name+'.'+options.figuretype, format=options.figuretype, dpi=options.dpi)
+
+        else:
+            pl.savefig(str(output_dir)+"/"+clf_name+'.pdf', format='pdf', dpi=300)
+        pl.close()
+
+
+def make_prediction(X, y, feature_list, input_file, names, classifiers, output_dir):
+    '''
+    Make prediction on the test data
+    '''
+    test_df = pd.read_csv(input_file)
+    
+    imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
+    
+    test_X = test_df[feature_list].values
+    
+    imp.fit(test_X)
+    imp.transform(test_X)
+
+    feature_list.append("Class")
+    feature_list.append("Probability")
+
+    for name, clf in zip(names, classifiers):
+        
+        print "Training and predicting usind "+name+"..."
+        
+        clf = clf.fit(X,y)
+
+        pred_prob = clf.predict_proba(test_X)
+
+        #print predictions
+        test_df["Probability"] = pd.Series(pred_prob[:,1])
+    
+        pred_class = np.zeros(len(test_X))
+        pred_class[pred_prob[:,1] >= 0.5 ] = 1
+        pred_class[pred_prob[:,1] < 0.5 ] = 0
+
+        test_df["Class"] = pd.Series(pred_class)
+
+        test_df.to_csv(output_dir+"/Improse_"+name+"_predictions.csv", cols=feature_list, index=False)
+
+def main():
+    '''
+    This is main function for Improse - Integrated Methods for Prediction of Super-Enhancers
+    '''
+    usage = """
+    Welcome to Improse - Integrated Methods for Prediction of Super-Enhancers
+
+    Run demo example with 10-fold cross-validation using:
+
+        %s --demo
+
+    Read more about Improse https://github.com/asntech/improse
+
+    """ % sys.argv[0]
+    
+    parser = OptionParser(usage = usage)    
+    #The following parameters are required to run the program. 
+    parser.add_option("--demo", dest="demo", action='store_true',
+                    help = "Run Demo using Random Forest on mESC data with 10-fold cross-validation. \nYou can set --model all, if you want to run the test on all six models. Note: This will take few minutes.")
+
+    parser.add_option("-m","--model", dest="model", nargs = 1, type=str, default="rf",
+                    help = "Select model name. [rf, svm, knn, ab, dt, bn, all] (Default=rf)")
+
+    parser.add_option("-f","--feature", dest="feature", nargs = 1,  type=str, default=None,
+                    help = "Select features of features type to train the model and make predictions. Feature names should be comma separated. \nIf you are want to check the combinatorial predictive power of features, separate them using + sypbol.\n[H3K27ac,Brd4all, chromatin, tf, genomic]. (Default=all)")
+    
+    parser.add_option("--compare", dest="compare", action='store_true',
+                    help = "Compare the listed features in one ROC plot.")
+    
+    parser.add_option("-i","--input", dest="input", nargs = 1, type=str, default=None,
+                    help = "Input file to use as test data or to make predictions. Please provide a CSV file with computed features and a 'Class' label if its test data.")
+
+    parser.add_option("-t","--test", dest="test", action='store_true',
+                    help = "Set if input file is a test file.")
+
+    parser.add_option("-p","--pred", dest="pred", action='store_true',
+                    help = "Set if input file is for prediction.")
+
+    parser.add_option("-c","--cv", nargs = 1, type=int, default=10,
+                    help = "Set Cross-validation folds. (default=10)")
+
+    parser.add_option("-s","--sampling", nargs = 1, type=str, default="down",
+                    help = "Data sampling. [down=Downsampling, up=SMOTE]")
+
+    parser.add_option("-o","--output",  nargs = 1, type=str, default=None,
+                    help = "Enter output folder path. By default results will be saved in the current working directory.")    
+      
+    parser.add_option("--figuretype", dest="figuretype", nargs = 1, type=str, default="pdf",
+                    help = "Figure type [pdf, eps, jpg, png] (default=pdf)")
+
+    parser.add_option("--dpi", dest="dpi", nargs = 1, type=int, default=300,
+                    help = "DPI(Dots per inch) of figure. (default=300)")
+    #parser.add_argument('--version', action='version', version='%(prog)s 1.0')
+
+    #checking the parameters
+    (options,args) = parser.parse_args()
+
+    if not options.pred and not options.test and not options.demo:
+        parser.print_help()
+        sys.exit(1)
+
+    #making the out folder if it doesn't exist
+    if options.output:
+        output_dir = create_dir(options.output)
+    else:
+        output_dir = create_dir(os.getcwd()+"/Improse_results")
+
+    #Original or SMOTE or Undersampling
+    sampling = options.sampling 
+
+    if options.compare:
+        feature_compare = True
+    else:
+        feature_compare = False
+
+    feature_list = []
+    if options.feature == None:
+        feature_list = [["chromatin"],["tf"], ["genomic"],["all"]]
+    
+    elif options.feature == 'chromatin' or options.feature == 'tf' or options.feature == 'genomic' or options.feature == 'all':
+        
+        feature_list.append(options.feature)
+
+    else:
+        features = options.feature.split(',')
+        #feature_list = list(feature_list)
+        for feature in features:
+            if feature.split("+"):
+               feature_list.append(feature.split("+"))
+            else:
+                feature_list.append(feature)
+        print feature_list
+        #exit()
+
+    if options.model:
+        names, classifiers = get_model(options.model)
+    else:
+        names, classifiers = get_model('rf')
+
+    if options.demo:
+
+        run_test(feature_list,classifiers,names,output_dir, options, sampling, feature_compare)
+
+    elif options.input:
+        print('Preaparing the data...')
+        feature_list = sum(feature_list, [])
+        X, y = get_data(feature_list, sampling, options.feature)
+
+        if not os.path.exists(options.input):
+            print("\nThe input file does not exit. Please check it again.")
+            #exit()
+        else:
+            if options.pred:
+                print('\nTraining the model and making predictions')
+                make_prediction(X, y, feature_list, options.input , names, classifiers, output_dir);
+            elif options.test:
+                print('\nTraining the model and testing it using provided data')
+                run_test(feature_list,classifiers,names,output_dir, options, sampling, feature_compare)
+            else:
+                print('\nYou forgot to mention weather the input file is to use as test or to make prediction.')
+                parser.print_help()
+                exit()
+
+    else:
+        print('\nPlease make sure you provided all the required parameters')
+        parser.print_help()
+        exit()
+
+
+    print '\nYou are done! Please check your results @ '+output_dir+'. \nThank you for using Improse!\n'
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.stderr.write("I got interrupted. :-( Bye!\n")
+        sys.exit(0)
+        
+        
+        
+        
+        
+        
