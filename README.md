@@ -4,6 +4,14 @@ Improse - Integrated Methods for Prediction of Super-Enhancers
 ## Introduction
 This is an easy to install and run python package for Improse (Integrated Methods for Prediction of Super-Enhancers)
 
+## Prerequisites
+		
+	 Python 2.7
+	 sklearn
+	 numpy
+	 scipy
+	 pandas
+
 
 ## How to install
 
