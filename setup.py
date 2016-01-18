@@ -26,16 +26,17 @@ CLASSIFIERS = [
 ]
 
 install_requires = [
-    #'scipy',
-    #'numpy',
-    #'sklearn',
-    #'pandas',
+    'scipy',
+    'numpy',
+    'scikit-learn',
+    'pandas',
+    'argparse'
 ]
 
 setup(
     name="improse",
     description="Integrated Methods for Prediction of Super-Enhancers",
-    version=0.1,
+    version=1.0,
     author="Aziz Khan",
     #Keywords= "bioinformatics,genomics",
     author_email="khana10@mails.tsinghua.edu.cn",

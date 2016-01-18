@@ -1,10 +1,10 @@
 Introduction
 ============
-Improse is a supervised machine learning approach to predict super-enhancers or constituents of super-enhancers for a list of candidate enhancers. Improse integrated diverse features including DNase I hypersensitivity (DNaseI), histone modifications (HMs), cofactors, transcription factors (TFs) and DNA sequence specific features.
+Improse is a supervised machine learning approach to predict super-enhancers or constituents of super-enhancers from a list of candidate enhancers. Improse integrated diverse features including DNase I hypersensitivity (DNaseI), histone modifications (HMs), cofactors, transcription factors (TFs) and DNA sequence specific features.
 
 Improse comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB).
 
-Random Forest is our optimal and default model but user can select any of the model and further test it using cross-validation, independent test data or to make predictions. 
+Random Forest is our optimal and default model but user can select any of the models and further test it using cross-validation, independent test data or to make predictions. 
 
 Installation
 ============
@@ -17,7 +17,7 @@ Improse requires:
 	* NumPy (>= 1.6.1): http://www.numpy.org/
 	* SciPy (>= 0.9): http://www.scipy.org/
 	* Scikit-learn (>= 0.17): http://scikit-learn.org/
-	* Pandas (>= 0.16.2): http://pandas.pydata.org/
+	* Pandas (>= 0.16.0): http://pandas.pydata.org/
 
 If you already have a working installation of numpy and scipy, the easiest way to install scikit-learn and pandas is using pip::
 
@@ -84,7 +84,7 @@ To tell the model to use specific features you need to type::
 
 	improse --model svm --feature H3K27ac,Brd4,p300,pGC
 
-Make sure the features names are coma separated. 
+Make sure the features names are comma separated. 
 
 If you want to compare the individual predictive power or combinatorial predictive power of different features, you need to pass the argument ``--compare`` with ``--features``::
 
@@ -92,9 +92,9 @@ If you want to compare the individual predictive power or combinatorial predicti
 
 To check the combinatorial predictive power of features, you need to combine features with ``+`` symbol::
 
-	improse --model svm --feature H3K27ac+Brd4,p300,pGC+pAT --compare
+	improse --model svm --feature H3K27ac+Brd4,p300,GC_content+AT_content --compare
 
-Here model will test the combinatorial predictive power [H3K27ac,Brd4] and [pGC,pAT] along with p300.
+Here model will test the combinatorial predictive power [H3K27ac,Brd4] and [GC_content,AT_content] along with p300.
 
 Run model with cross-validation
 -------------------------------
