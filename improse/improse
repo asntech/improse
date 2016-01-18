@@ -36,8 +36,8 @@ def get_data(feature_comb, sampling = None, feature_set = 'all'):
     
     #downsample negative cases - there are many more negatives than positives
     if sampling == 'down':
-        #data_file = data_path+"/data/original_data.csv"
-        data_file = "/Users/azizkhan/projects/python/improse/improse/data/original_data.csv" 
+        data_file = data_path+"/data/original_data.csv"
+        #data_file = "/Users/azizkhan/projects/python/improse/improse/data/original_data.csv" 
         train_df = pd.read_csv(data_file)
 
         indices = np.where(train_df.Class == 'TE')[0]
@@ -46,8 +46,8 @@ def get_data(feature_comb, sampling = None, feature_set = 'all'):
         n_pos = (train_df.Class == 'SE').sum()
         train_df = train_df.drop(train_df.index[indices[n_pos:]])
     else:
-        #data_file = data_path+"/data/train_data.csv"
-        data_file = "/Users/azizkhan/projects/python/improse/improse/data/train_data.csv" 
+        data_file = data_path+"/data/train_data.csv"
+        #data_file = "/Users/azizkhan/projects/python/improse/improse/data/train_data.csv" 
         train_df = pd.read_csv(data_file)
 
     if feature_comb == "genomic" or feature_comb[0] == "genomic":
