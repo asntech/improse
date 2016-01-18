@@ -40,7 +40,7 @@ Install from the source
 
 	 python setup.py install
 
-## Using Improse
+## Use Improse
 Once you have installed Improse, you can type:
 	improse --help
 to find the avaiable commands and required parameters to run Improse. 
@@ -58,11 +58,27 @@ This will save the results in the current working directory with a folder named 
 ### Select model 
 Improse comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB). Random Forest is the default model.
 
-To select a model you need to type
-	 --model MODEL_NAME
+To select model you need to type:
+	 
+	 improse --model MODEL_NAME
+
 MODEL_NAME can be 'rf', 'svm', 'knn', 'ab', 'dt', 'nb' or use 'all' if you want use all models one by one.
 
 ### Define features and feature subsets
+To select model you need to type:
+	 
+	 improse --model svm --feature H3K27ac,Brd4,p300,pGC
+
+Make sure the features names are coma separated. 
+
+If you want to compare the indidual predictive power or combinatorial predive power of different features, you need to pass the argument '--compare' with '--features'
+
+	 improse --model svm --feature H3K27ac,Brd4,p300,pGC --compare
+
+To check the combinatorial predive power of features, you need to combine features with '+' symbole
+
+	 improse --model svm --feature H3K27ac+Brd4,p300, pGC+pAT --compare
+
 
 ### Run model with cross-validation
 
