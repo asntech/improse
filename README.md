@@ -43,7 +43,7 @@ Install from the source
 ## Use Improse
 Once you have installed Improse, you can type:
 	improse --help
-to find the avaiable commands and required parameters to run Improse. 
+to find the available commands and required parameters to run Improse. 
 
 ### Improse demo
 
@@ -71,18 +71,18 @@ To tell the model to use specific features you need to type:
 
 Make sure the features names are coma separated. 
 
-If you want to compare the indidual predictive power or combinatorial predive power of different features, you need to pass the argument '--compare' with '--features'
+If you want to compare the individual predictive power or combinatorial predictive power of different features, you need to pass the argument '--compare' with '--features'
 
 	 improse --model svm --feature H3K27ac,Brd4,p300,pGC --compare
 
-To check the combinatorial predive power of features, you need to combine features with '+' symbole
+To check the combinatorial predictive power of features, you need to combine features with '+' symbol
 
 	 improse --model svm --feature H3K27ac+Brd4,p300,pGC+pAT --compare
 
-Here model will test the combinatorial predive power [H3K27ac,Brd4] and [pGC,pAT] along with p300.
+Here model will test the combinatorial predictive power [H3K27ac,Brd4] and [pGC,pAT] along with p300.
 
-### Set cross-validation
-By default all models are using 10-fold cross-validation. If you want to set different fold lets say 5, set '--cv' parameter as:
+### Run model with cross-validation
+By default all models use 10-fold cross-validation. If you want to set different fold lets say 5, set '--cv' parameter as:
 
 	 improse --model rf --feature H3K27ac,Brd4,p300,pGC,pAT,phastCons --cv 5
 
