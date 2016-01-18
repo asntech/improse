@@ -1,0 +1,254 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How to use Improse &mdash; Improse 1.0 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Improse 1.0 documentation" href="index.html"/>
+        <link rel="next" title="Support" href="support.html"/>
+        <link rel="prev" title="Installation" href="install.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> Improse</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#install-improse">Install Improse</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">How to use Improse</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#improse-demo">Improse demo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#select-model">Select model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#define-features-and-feature-subsets">Define features and feature subsets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-model-with-cross-validation">Run model with cross-validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-model-with-test-data">Run model with test data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#make-predictions">Make predictions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="support.html">Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cite.html">Cite us</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Improse</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>How to use Improse</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/howto.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="how-to-use-improse">
+<h1>How to use Improse<a class="headerlink" href="#how-to-use-improse" title="Permalink to this headline">¶</a></h1>
+<p>Once you have installed Improse, you can type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">improse</span> <span class="o">--</span><span class="n">help</span>
+</pre></div>
+</div>
+<p>to find the available commands and required parameters to run Improse.</p>
+<div class="section" id="improse-demo">
+<h2>Improse demo<a class="headerlink" href="#improse-demo" title="Permalink to this headline">¶</a></h2>
+<p>To run a demo using Random Forest model and validate it using 10-fold cross-validation, you can type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">improse</span> <span class="o">--</span><span class="n">demo</span>
+</pre></div>
+</div>
+<p>This will save the results in the current working directory with a folder named <code class="docutils literal"><span class="pre">Improse_results</span></code>. If you wish to save the results in a specific folder, you can type:</p>
+<div class="highlight-python"><div class="highlight"><pre>improse --demo --output ~/path/to/your/folder
+</pre></div>
+</div>
+</div>
+<div class="section" id="select-model">
+<h2>Select model<a class="headerlink" href="#select-model" title="Permalink to this headline">¶</a></h2>
+<p>Improse comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB). Random Forest is the default model.</p>
+<p>To select model you need to type:</p>
+<div class="highlight-python"><div class="highlight"><pre>improse --model MODEL_NAME
+</pre></div>
+</div>
+<p>MODEL_NAME can be <code class="docutils literal"><span class="pre">rf</span></code>, <code class="docutils literal"><span class="pre">svm</span></code>, <code class="docutils literal"><span class="pre">knn</span></code>, <code class="docutils literal"><span class="pre">ab</span></code>, <code class="docutils literal"><span class="pre">dt</span></code>, <code class="docutils literal"><span class="pre">nb</span></code> or use <code class="docutils literal"><span class="pre">all</span></code> if you want use all models one by one.</p>
+</div>
+<div class="section" id="define-features-and-feature-subsets">
+<h2>Define features and feature subsets<a class="headerlink" href="#define-features-and-feature-subsets" title="Permalink to this headline">¶</a></h2>
+<p>To tell the model to use specific features you need to type:</p>
+<div class="highlight-python"><div class="highlight"><pre>improse --model svm --feature H3K27ac,Brd4,p300,pGC
+</pre></div>
+</div>
+<p>Make sure the features names are coma separated.</p>
+<p>If you want to compare the individual predictive power or combinatorial predictive power of different features, you need to pass the argument <code class="docutils literal"><span class="pre">--compare</span></code> with <code class="docutils literal"><span class="pre">--features</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre>mprose --model svm --feature H3K27ac,Brd4,p300,pGC --compare
+</pre></div>
+</div>
+<p>To check the combinatorial predictive power of features, you need to combine features with <code class="docutils literal"><span class="pre">+</span></code> symbol:</p>
+<div class="highlight-python"><div class="highlight"><pre>improse --model svm --feature H3K27ac+Brd4,p300,pGC+pAT --compare
+</pre></div>
+</div>
+<p>Here model will test the combinatorial predictive power [H3K27ac,Brd4] and [pGC,pAT] along with p300.</p>
+</div>
+<div class="section" id="run-model-with-cross-validation">
+<h2>Run model with cross-validation<a class="headerlink" href="#run-model-with-cross-validation" title="Permalink to this headline">¶</a></h2>
+<p>By default all models use 10-fold cross-validation. If you want to set different fold lets say 5, set <code class="docutils literal"><span class="pre">--cv</span></code> parameter as:</p>
+<div class="highlight-python"><div class="highlight"><pre>improse --model rf --feature H3K27ac,Brd4,p300,pGC,pAT,phastCons --cv 5
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-model-with-test-data">
+<h2>Run model with test data<a class="headerlink" href="#run-model-with-test-data" title="Permalink to this headline">¶</a></h2>
+<p>To run the model with a test data you need the feature data saved a CSV file. Next, you need to tell the model, features you have to make prediction with using <code class="docutils literal"><span class="pre">--feature</span></code> and also provide the CSV file to &#8216;&#8211;input&#8217; and next type <code class="docutils literal"><span class="pre">--test</span></code> to tell model it is test datasets:</p>
+<div class="highlight-python"><div class="highlight"><pre>improse --model rf --feature H3K27ac,Brd4,p300,pGC,pAT,phastCons --input ~/path/to/CSV/file.csv --test
+</pre></div>
+</div>
+<p>This will generate an ROC plot and save the performance evaluations [precision, recall, f1-score, AUC, PRC] to <code class="docutils literal"><span class="pre">Improse_tesults.txt</span></code>.</p>
+</div>
+<div class="section" id="make-predictions">
+<h2>Make predictions<a class="headerlink" href="#make-predictions" title="Permalink to this headline">¶</a></h2>
+<p>To make predictions should have computed available features and saved a CSV file. Next, you need to tell the model the features you have to make prediction with using <code class="docutils literal"><span class="pre">--feature</span></code> and also provide the CSV file to <code class="docutils literal"><span class="pre">--input</span></code> and next type <code class="docutils literal"><span class="pre">--pred</span></code> to make predictions:</p>
+<div class="highlight-python"><div class="highlight"><pre>improse --model rf --feature H3K27ac,Brd4,p300,pGC,pAT,phastCons --input ~/path/to/CSV/file.csv --pred
+</pre></div>
+</div>
+<p>This will save the predictions results as CSV file <code class="docutils literal"><span class="pre">Improse_[MODEL_NAME]_predictions.csv</span></code>. In the CSV file the field Class is 1=SE and 0=TE. We also report  probability score for each prediction to tell the user how good and bad a prediction is. This will help to decide which candidates to select for further analysis.</p>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="support.html" class="btn btn-neutral float-right" title="Support">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="install.html" class="btn btn-neutral" title="Installation"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Aziz Khan.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
