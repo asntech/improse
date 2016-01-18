@@ -5,17 +5,29 @@ Improse - Integrated Methods for Prediction of Super-Enhancers
 This is an easy to install and run python package for Improse (Integrated Methods for Prediction of Super-Enhancers)
 
 ## Prerequisites
-		
-	 Python 2.7
-	 sklearn
-	 numpy
-	 scipy
-	 pandas
+Improse required:
+			
+	 Python (>= 2.6 or >= 3.3),
+	 NumPy (>= 1.6.1), http://www.numpy.org/
+	 SciPy (>= 0.9), http://www.scipy.org/
+	 Scikit-learn (>= 0.17), http://scikit-learn.org/
+	 Pandas (>= 0.16.2). http://pandas.pydata.org/
+
+If you already have a working installation of numpy and scipy, the easiest way to install scikit-learn is using pip
+
+	 pip install -U scikit-learn
+
+or using conda:
+
+	 conda install scikit-learn
+
+If you don’t already have a python installation with numpy, scipy and pandas, we recommend to install either via your package manager or via a python bundles (Canopy, Anaconda). These come with numpy, scipy, scikit-learn, pandas and many other helpful scientific and data processing libraries and available for platforms including Windows, Mac OSX and Linux.
 
 
-## How to install
+## How to install Improse
+You can install Improse either from PyPi using pip and install it from the source. Please make sure you have already installed the above mentioned python libraries required to run Improse.
 
-Instal from PyPi
+Install from PyPi
 
 	 pip install improse
 
