@@ -10,11 +10,11 @@ Prerequisites
 -------------
 Improse requires:
 
-	* Python (>= 2.6 or >= 3.3)
-	* .. _NumPy (>= 1.6.1): http://www.numpy.org/
-	* .. _SciPy (>= 0.9): http://www.scipy.org/
-	* .. _Scikit-learn (>= 0.17): http://scikit-learn.org/
-	* .. _Pandas (>= 0.16.2): http://pandas.pydata.org/
+	* Python (>= 2.6 or >= 3.3),
+	* NumPy (>= 1.6.1), http://www.numpy.org/
+	* SciPy (>= 0.9), http://www.scipy.org/
+	* Scikit-learn (>= 0.17), http://scikit-learn.org/
+	* Pandas (>= 0.16.2). http://pandas.pydata.org/
 
 If you already have a working installation of numpy and scipy, the easiest way to install scikit-learn and pandas is using pip::
 
@@ -41,9 +41,7 @@ Install from PyPi::
 	pip install improse
 
 Install from the source::
-	
-	tar -zxvf improse-1.0.tar.gz
-	cd improse-1.0
+
 	python setup.py install
 
 How to use Improse
