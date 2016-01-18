@@ -6,6 +6,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+
 build/
 develop-eggs/
 dist/
@@ -29,7 +30,12 @@ var/
 
 
 # Sphinx documentation
+docs/
 docs/_build/
+docs/_static/
+docs/_templates/
+
+
 
 # PyBuilder
 target/
