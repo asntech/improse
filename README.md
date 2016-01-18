@@ -29,7 +29,7 @@ or using conda:
 If you don’t already have a python installation with numpy, scipy and pandas, we recommend to install either via your package manager or via a python bundles (Canopy, Anaconda). These come with numpy, scipy, scikit-learn, pandas and many other helpful scientific and data processing libraries and available for platforms including Windows, Mac OSX and Linux.
 
 
-## How to install Improse
+## Install Improse
 You can install Improse either from PyPi using pip and install it from the source. Please make sure you have already installed the above mentioned python libraries required to run Improse.
 
 Install from PyPi
@@ -40,13 +40,39 @@ Install from the source
 
 	 python setup.py install
 
-## How to use it
+## Using Improse
+Once you have installed Improse, you can type:
 	improse --help
+to find the avaiable commands and required parameters to run Improse. 
+
+### Improse demo
+
+To run a demo using Random Forest model and validate it using 10-fold cross-validation, you can type
+
+	improse --demo
+
+This will save the results in the current working directory with a folder named 'Improse_results'. If you wish to save the results in a specific folder, you can type
+
+	improse --demo --output ~/path/to/your/folder
+
+### Select model 
+Improse comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB). Random Forest is the default model.
+
+To select a model you need to type
+	 --model MODEL_NAME
+MODEL_NAME can be 'rf', 'svm', 'knn', 'ab', 'dt', 'nb' or use 'all' if you want use all models one by one.
+
+### Define features and feature subsets
+
+### Run model with cross-validation
+
+### Run model with test data
+
+### Make predictions
 
 
-### Support
-You you have questions, or found any bug in the program, please write to us at khana10[at]mails.tsinghua.edu.cn
+## Support
+If you have questions, or found any bug in the program, please write to us at khana10[at]mails.tsinghua.edu.cn
 
-### Cite Us
+## Cite Us
 If you use Improse please cite us: 
-* Aziz Khan, Xuegong Zhang, 2016
