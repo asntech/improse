@@ -4,7 +4,7 @@ Improse is a supervised machine learning approach to predict super-enhancers or 
 
 Improse comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB).
 
-Random Forest is our optimal and default model but user can select any of the models and further test it using cross-validation, independent test data or to make predictions. 
+Random Forest is our optimal and default model but user can select any of the models and further test it using cross-validation, independent test data or use it to make predictions. 
 
 Installation
 ============
@@ -82,13 +82,13 @@ Define features and feature subsets
 -----------------------------------
 To tell the model to use specific features you need to type::
 
-	improse --model svm --feature H3K27ac,Brd4,p300,pGC
+	improse --model svm --feature H3K27ac,Brd4,p300,GC_Content
 
 Make sure the features names are comma separated. 
 
 If you want to compare the individual predictive power or combinatorial predictive power of different features, you need to pass the argument ``--compare`` with ``--features``::
 
-	mprose --model svm --feature H3K27ac,Brd4,p300,pGC --compare
+	improse --model svm --feature H3K27ac,Brd4,p300,GC_content --compare
 
 To check the combinatorial predictive power of features, you need to combine features with ``+`` symbol::
 
@@ -100,7 +100,7 @@ Run model with cross-validation
 -------------------------------
 By default all models use 10-fold cross-validation. If you want to set different fold lets say 5, set ``--cv`` parameter as::
 
-	improse --model rf --feature H3K27ac,Brd4,p300,pGC,pAT,phastCons --cv 5
+	improse --model rf --feature H3K27ac,Brd4,p300,GC_Content,AT_Content,phastCons --cv 5
 
 Run model with test data
 ------------------------
