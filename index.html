@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>Improse by asntech</title>
+    <title>imPROSE by asntech</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -11,8 +11,8 @@
   </head>
   <body>
     <section class="page-header">
-      <h1 class="project-name">Improse</h1>
-      <h2 class="project-tagline">Improse - Integrated Methods for Prediction of Super-Enhancers</h2>
+      <h1 class="project-name">imPROSE</h1>
+      <h2 class="project-tagline">imPROSE - Integrated Methods for Prediction of Super-Enhancers</h2>
       <a href="https://github.com/asntech/improse" class="btn">View on GitHub</a>
       <a href="https://github.com/asntech/improse/zipball/master" class="btn">Download .zip</a>
       <a href="https://github.com/asntech/improse/tarball/master" class="btn">Download .tar.gz</a>
@@ -20,7 +20,7 @@
 
     <section class="main-content">
       <h1>
-<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h1>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h1>
 
 <p>Improse is a supervised machine learning approach to predict super-enhancers or constituents of super-enhancers for a list of candidate enhancers. Improse integrated diverse features including DNase I hypersensitivity (DNaseI), histone modifications (HMs), cofactors, transcription factors (TFs) and DNA sequence specific features.</p>
 
@@ -29,10 +29,10 @@
 <p>Random Forest is our optimal and default model but user can select any of the model and further test it using cross-validation, independent test data or to make predictions. </p>
 
 <h1>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h1>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
 
 <h2>
-<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prerequisites</h2>
+<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Prerequisites</h2>
 
 <p>Improse requires:</p>
 
@@ -60,7 +60,7 @@ conda install pandas
 <p>If you don’t already have a python installation with numpy, scipy and pandas, we recommend to install either via your package manager or via a python bundles (Canopy, Anaconda). These come with numpy, scipy, scikit-learn, pandas and many other helpful scientific and data processing libraries and available for platforms including Windows, Mac OSX and Linux.</p>
 
 <h2>
-<a id="install-improse" class="anchor" href="#install-improse" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install Improse</h2>
+<a id="install-improse" class="anchor" href="#install-improse" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install Improse</h2>
 
 <p>You can install Improse either from PyPi using pip and install it from the source. Please make sure you have already installed the above mentioned python libraries required to run Improse.</p>
 
@@ -77,7 +77,7 @@ python setup.py install
 </code></pre>
 
 <h1>
-<a id="how-to-use-improse" class="anchor" href="#how-to-use-improse" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use Improse</h1>
+<a id="how-to-use-improse" class="anchor" href="#how-to-use-improse" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use Improse</h1>
 
 <p>Once you have installed Improse, you can type::</p>
 
@@ -87,7 +87,7 @@ python setup.py install
 <p>to find the available commands and required parameters to run Improse. </p>
 
 <h2>
-<a id="improse-demo" class="anchor" href="#improse-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Improse demo</h2>
+<a id="improse-demo" class="anchor" href="#improse-demo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Improse demo</h2>
 
 <p>To run a demo using Random Forest model and validate it using 10-fold cross-validation, you can type::</p>
 
@@ -100,7 +100,7 @@ python setup.py install
 </code></pre>
 
 <h2>
-<a id="select-model" class="anchor" href="#select-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Select model</h2>
+<a id="select-model" class="anchor" href="#select-model" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Select model</h2>
 
 <p>Improse comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB). Random Forest is the default model.</p>
 
@@ -112,7 +112,7 @@ python setup.py install
 <p>MODEL_NAME can be <code>rf</code>, <code>svm</code>, <code>knn</code>, <code>ab</code>, <code>dt</code>, <code>nb</code> or use <code>all</code> if you want use all models one by one.</p>
 
 <h2>
-<a id="define-features-and-feature-subsets" class="anchor" href="#define-features-and-feature-subsets" aria-hidden="true"><span class="octicon octicon-link"></span></a>Define features and feature subsets</h2>
+<a id="define-features-and-feature-subsets" class="anchor" href="#define-features-and-feature-subsets" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Define features and feature subsets</h2>
 
 <p>To tell the model to use specific features you need to type::</p>
 
@@ -134,7 +134,7 @@ python setup.py install
 <p>Here model will test the combinatorial predictive power [H3K27ac,Brd4] and [pGC,pAT] along with p300.</p>
 
 <h2>
-<a id="run-model-with-cross-validation" class="anchor" href="#run-model-with-cross-validation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Run model with cross-validation</h2>
+<a id="run-model-with-cross-validation" class="anchor" href="#run-model-with-cross-validation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run model with cross-validation</h2>
 
 <p>By default all models use 10-fold cross-validation. If you want to set different fold lets say 5, set <code>--cv</code> parameter as::</p>
 
@@ -142,7 +142,7 @@ python setup.py install
 </code></pre>
 
 <h2>
-<a id="run-model-with-test-data" class="anchor" href="#run-model-with-test-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Run model with test data</h2>
+<a id="run-model-with-test-data" class="anchor" href="#run-model-with-test-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run model with test data</h2>
 
 <p>To run the model with a test data you need the feature data saved a CSV file. Next, you need to tell the model, features you have to make prediction with using <code>--feature</code> and also provide the CSV file to '--input' and next type <code>--test</code> to tell model it is test datasets::</p>
 
@@ -152,7 +152,7 @@ python setup.py install
 <p>This will generate an ROC plot and save the performance evaluations [precision, recall, f1-score, AUC, PRC] to <code>Improse_tesults.txt</code>.</p>
 
 <h2>
-<a id="make-predictions" class="anchor" href="#make-predictions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Make predictions</h2>
+<a id="make-predictions" class="anchor" href="#make-predictions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Make predictions</h2>
 
 <p>To make predictions should have computed available features and saved a CSV file. Next, you need to tell the model the features you have to make prediction with using <code>--feature</code> and also provide the CSV file to <code>--input</code> and next type <code>--pred</code> to make predictions::</p>
 
@@ -162,17 +162,17 @@ python setup.py install
 <p>This will save the predictions results as CSV file <code>Improse_[MODEL_NAME]_predictions.csv</code>. In the CSV file the field Class is 1=SE and 0=TE. We also report  probability score for each prediction to tell the user how good and bad a prediction is. This will help to decide which candidates to select for further analysis.</p>
 
 <h1>
-<a id="support" class="anchor" href="#support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support</h1>
+<a id="support" class="anchor" href="#support" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support</h1>
 
 <p>If you have questions, or found any bug in the program, please write to us at <code>khana10[at]mails.tsinghua.edu.cn</code></p>
 
 <h1>
-<a id="cite-us" class="anchor" href="#cite-us" aria-hidden="true"><span class="octicon octicon-link"></span></a>Cite Us</h1>
+<a id="cite-us" class="anchor" href="#cite-us" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Cite Us</h1>
 
 <p>If you use Improse please cite us: </p>
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/asntech/improse">Improse</a> is maintained by <a href="https://github.com/asntech">asntech</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/asntech/improse">imPROSE</a> is maintained by <a href="https://github.com/asntech">asntech</a>.</span>
 
         <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
