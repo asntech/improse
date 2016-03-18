@@ -1,8 +1,8 @@
 Introduction
 ============
-Improse is a supervised machine learning approach to predict super-enhancers or constituents of super-enhancers from a list of candidate enhancers. Improse integrated diverse features including DNase I hypersensitivity (DNaseI), histone modifications (HMs), cofactors, transcription factors (TFs) and DNA sequence specific features.
+imPROSE is a supervised machine learning approach to predict super-enhancers or constituents of super-enhancers from a list of candidate enhancers. imPROSE integrated diverse features including DNase I hypersensitivity (DNaseI), histone modifications (HMs), cofactors, transcription factors (TFs) and DNA sequence specific features.
 
-Improse comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB).
+imPROSE comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB).
 
 Random Forest is our optimal and default model but user can select any of the models and further test it using cross-validation, independent test data or use it to make predictions. 
 
@@ -11,7 +11,7 @@ Installation
 
 Prerequisites
 -------------
-Improse requires:
+imPROSE requires:
 
 	* Python (>= 2.6 or >= 3.3)
 	* NumPy (>= 1.6.1): http://www.numpy.org/
@@ -35,9 +35,9 @@ or using conda::
 If you don’t already have a python installation with numpy, scipy and pandas, we recommend to install either via your package manager or via a python bundles (Canopy, Anaconda). These come with numpy, scipy, scikit-learn, pandas and many other helpful scientific and data processing libraries and available for platforms including Windows, Mac OSX and Linux.
 
 
-Install Improse
+Install imPROSE
 ---------------
-You can install Improse either from PyPi using pip and install it from the source. Please make sure you have already installed the above mentioned python libraries required to run Improse.
+You can install imPROSE either from PyPi using pip and install it from the source. Please make sure you have already installed the above mentioned python libraries required to run imPROSE.
 
 Install from PyPi::
 
@@ -51,13 +51,13 @@ Install from the source::
 
 How to use Improse
 ==================
-Once you have installed Improse, you can type::
+Once you have installed imPROSE, you can type:
 
 	improse --help
 
-to find the available commands and required parameters to run Improse. 
+to find the available commands and required parameters to run imPROSE. 
 
-Improse demo
+imPROSE demo
 -------------
 
 To run a demo using Random Forest model and validate it using 10-fold cross-validation, you can type::
@@ -70,7 +70,7 @@ This will save the results in the current working directory with a folder named 
 
 Select model
 ------------
-Improse comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB). Random Forest is the default model.
+imPROSE comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB). Random Forest is the default model.
 
 To select model you need to type::
 
@@ -124,4 +124,4 @@ If you have questions, or found any bug in the program, please write to us at ``
 
 Cite Us
 =========
-If you use Improse please cite us: 
+If you use imPROSE please cite us: 
