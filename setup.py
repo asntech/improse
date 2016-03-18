@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This is a setup script for Improse -- Integrated Methods for Prediction of Super-Enhancers
+This is a setup script for imPROSE -- Integrated Methods for Prediction of Super-Enhancers
 
 This code is free software; you can redistribute it and/or modify it under the terms of the 
 BSD License (see the file LICENSE.md included with the distribution).
@@ -14,7 +14,10 @@ import os
 from distutils.core import setup
 from setuptools import find_packages
 
+#from improse import __version__
+
 #VERSION = __import__("improse").__version__
+VERSION = '1.0'
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
@@ -36,7 +39,7 @@ install_requires = [
 setup(
     name="improse",
     description="Integrated Methods for Prediction of Super-Enhancers",
-    version=1.0,
+    version=VERSION,
     author="Aziz Khan",
     #Keywords= "bioinformatics,genomics",
     author_email="khana10@mails.tsinghua.edu.cn",

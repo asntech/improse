@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
-Improse - Integrated Methods for Prediction of Super-Enhancers
+imPROSE - Integrated Methods for Prediction of Super-Enhancers
 Created on Sun Oct 05 18:33:53 2014
 Version: 1.0
 @author: Aziz Khan
@@ -22,8 +21,11 @@ import datetime
 import improse
 from optparse import OptionParser
 
-#import warnings
-#warnings.filterwarnings('ignore')
+import warnings
+warnings.filterwarnings('ignore')
+
+__version__ = '1.0'
+
 
 def get_data(feature_comb, sampling = None, feature_set = 'all'):
     '''
@@ -33,50 +35,115 @@ def get_data(feature_comb, sampling = None, feature_set = 'all'):
     data_path = os.path.dirname(improse.__file__)
     
     #downsample negative cases - there are many more negatives than positives
-    if sampling == 'down':
+    if sampling == 'down' or feature_comb[0] == "Undersampling":
         data_file = data_path+"/data/original_data.csv"
         #data_file = "/Users/azizkhan/projects/python/improse/improse/data/original_data.csv" 
+
         train_df = pd.read_csv(data_file)
 
-        indices = np.where(train_df.Class == 'TE')[0]
-        rng = np.random.RandomState(13)
-        rng.shuffle(indices)
-        n_pos = (train_df.Class == 'SE').sum()
-        train_df = train_df.drop(train_df.index[indices[n_pos:]])
+        train_df = downsample(train_df)
+
+    elif sampling == 'hybrid' or feature_comb[0] == "Hybrid sampling":
+        data_file = data_path+"/data/smote5k_data.csv"
+        #data_file = "/Users/azizkhan/projects/python/improse/improse/data/smote5k_data.csv" 
+        train_df = pd.read_csv(data_file)
+
+        train_df = downsample(train_df)
+    
+    elif sampling == 'imbalance' or feature_comb[0] == "Imbalance":
+        
+        #data_file = "/Users/azizkhan/projects/python/improse/improse/data/original_data.csv"
+        data_file = data_path+"/data/original_data.csv"
+
+        train_df = pd.read_csv(data_file)
+
     else:
-        data_file = data_path+"/data/train_data.csv"
+        data_file = data_path+"/data/smote5k_data.csv"
         #data_file = "/Users/azizkhan/projects/python/improse/improse/data/train_data.csv" 
+        #data_file = "/Users/azizkhan/projects/python/improse/improse/data/smote5k_data.csv" 
+
         train_df = pd.read_csv(data_file)
 
-    if feature_comb == "genomic" or feature_comb[0] == "genomic":
-        X = train_df[["GC_content","AT_content", "repeat_fraction","length","phastCons"]].values
+        '''
+        labels = list(train_df.columns.values)
+        #print labels
+        ses_data = train_df[train_df.Class == 'SE']
+        tes_data = train_df[train_df.Class == 'TE']
 
-    elif feature_comb == "chromatin" or feature_comb[0] == "chromatin":
-        X = train_df[["Brd4","Cdk8","Cdk9","Med12","p300","CBP","Pol2","Lsd1","Brg1","Smc1","Nipbl","Mi2b","CHD7","HDAC2","HDAC","DnaseI"]].values
-    
-    elif feature_comb == "hms" or feature_comb[0] == "hms":
+        tes_data = tes_data.ix[:,tes_data.columns - ['chrom', 'start', 'end']]
+
+        oversample = SMOTE(ses_data.ix[:,ses_data.columns - ['chrom', 'start', 'end', 'Class']].values, 100, 5)
+
+        #print ses_data
+        ses_data = pd.DataFrame(oversample, columns=labels[4:])
+
+        ses_label = np.zeros(len(oversample))
+        ses_label[ses_label == 0 ] = 1
+
+        ses_label = ['SE'] * len(oversample)
+
+        ses_data["Class"] = pd.Series(ses_label)
+
+        ses_data.sort_index(axis=1)
+        train_df = pd.concat([ses_data,tes_data])
+        '''
+
+    if feature_comb[0] == "DNA Sequence":
+        X = train_df[["GC_content","repeat_fraction","phastCons"]].values
+ 
+    elif feature_comb[0] == "HMs":
         X = train_df[["H3K27ac","H3K4me1","H3K4me3","H3K9me3"]].values
+
+    elif feature_comb[0] == "CRs":
+        X = train_df[["Brd4","Brg1","CHD7"]].values
+
+    elif feature_comb[0] == "Lsd1-NuRD":
+        X = train_df[["Lsd1","Mi2b"]].values
+
+    elif feature_comb[0] == "Cohesion":
+        X = train_df[["Smc1","Nipbl"]].values
+
+    elif feature_comb[0] == "DNaseI":
+        X = train_df[["DNaseI","DNaseI"]].values
+
+    elif feature_comb[0] == "Pol II":
+        X = train_df[["Pol2","Pol2"]].values
+
+    elif feature_comb[0] == "P-TFEb":
+        X = train_df[["Cdk9","Cdk9"]].values
+
+    elif feature_comb[0] == "Mediator":
+        X = train_df[["Med12","Cdk8"]].values
+
+    elif feature_comb[0] == "Coactivators":
+        X = train_df[["p300","CBP"]].values
     
-    elif feature_comb == "tf" or feature_comb[0] == "tf":
-        X = train_df[["Oct4","Sox2","Nanog","Smad3","Stat3","Tcf3","","Klf4","Prdm14","Tcfcp2I1","Nr5a2"]].values
+    elif feature_comb[0] == "TFs":
+        X = train_df[["Oct4","Sox2","Nanog","Smad3","Stat3","Tcf3","Klf4","Esrrb","Prdm14","Tcfcp2I1","Nr5a2"]].values
  
     #H3K27ac, Brd4, Cdk8, Cdk9, p300, Med12
     elif feature_comb == "top6" or feature_comb[0] == "top6":
         X = train_df["H3K27ac","Brd4","Cdk8","Cdk9","p300","Med12"]
-    
+
+    elif feature_comb[0] == "Chromatin":
+        X = train_df[["Brd4","Cdk8","Cdk9","Med12","p300","CBP","Pol2","Lsd1","Brg1","Smc1","Nipbl","Mi2b","CHD7","HDAC2","HDAC","DNaseI"]].values
+   
     #motif
-    #elif feature_comb == "motif":
-        #X = train_df[["Esrrb","Klf4", "Smad3","H3K27ac","H3K4me1", "Brd4"]].values
-    #    X = np.genfromtxt(data_file, delimiter=',', usecols=(1,2,3,4,5,6,7,8,9,10,11,12,13,14),skip_header= 1)
+    #elif feature_comb[0] == "Motif":
+    #    data_file = "/Users/azizkhan/projects/python/improse/improse/data/motif_set5.csv" 
+
+    #   train_df = pd.read_csv(data_file)
+    #   X = train_df[["Oct4","Sox2","Nanog","Smad3","Stat3","Esrrb","Tcf3","Klf4","Prdm14","Tcfcp211","Nr5a2"]].values
+
     #all data
-    elif feature_comb == "all" or feature_comb[0] == "all":
-        X = train_df[["H3K27ac","H3K4me1","H3K4me3","H3K9me3","Oct4","Sox2","Nanog","Smad3","Stat3","Tcf3","Klf4","Prdm14","Tcfcp2I1","Nr5a2","Brd4","Cdk8","Cdk9","Med12","p300","CBP","Pol2","Lsd1","Brg1","Smc1","Nipbl","Mi2b","CHD7","HDAC2","HDAC","DNaseI","GC_content","AT_content","repeat_fraction","phastCons","length"]].values
-        #X = np.genfromtxt(data_file, delimiter=',', usecols=(5,6,7,8,9,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,44,45,46,47,48,49), skip_header= 1)
+    elif feature_comb == "All" or feature_comb[0] == "All" or feature_comb[0] == "Imbalance" or feature_comb[0] == "Undersampling" or feature_comb[0] == "Hybrid sampling" or feature_comb[0] == "Oversampling":
+        #X = train_df[["H3K27ac","H3K4me1","H3K4me3","H3K9me3","Oct4","Sox2","Nanog","Smad3","Stat3","Tcf3","Klf4","Esrrb","Prdm14","Tcfcp2I1","Nr5a2","Brd4","Cdk8","Cdk9","Med12","p300","CBP","Pol2","Lsd1","Brg1","Smc1","Nipbl","Mi2b","CHD7","HDAC2","HDAC","DNaseI","GC_content","AT_content","repeat_fraction","phastCons","length"]].values
+        X = train_df[["H3K27ac","H3K4me1","H3K4me3","H3K9me3","Oct4","Sox2","Nanog","Smad3","Stat3","Tcf3","Klf4","Esrrb","Prdm14","Tcfcp2I1","Nr5a2","Brd4","Cdk8","Cdk9","Med12","p300","CBP","Pol2","Lsd1","Brg1","Smc1","Nipbl","Mi2b","CHD7","HDAC2","HDAC","DNaseI","GC_content","repeat_fraction","phastCons"]].values
     else:
         if isinstance(feature_comb, basestring):
             features = []
             features.append(feature_comb)
-            features.append(feature_comb)
+            #features.append(feature_comb)
 
             X = train_df[features].values
         else:
@@ -86,18 +153,13 @@ def get_data(feature_comb, sampling = None, feature_set = 'all'):
     imp.fit(X)
     imp.transform(X)
 
-    #X.reshape(-1, 1)
     target = train_df["Class"].values
 
-    #print X
-    #print len(target)
-    #exit()
     y = np.zeros(len(X))
     y[target == 'SE'] = 1
     y[target == 'TE'] = 0
     
     return X, y
-
 
 def create_dir(dir_path):
 
@@ -107,12 +169,82 @@ def create_dir(dir_path):
         except:
             sys.exit( "Output directory (%s) could not be created." % dir_path )
     return dir_path
+def SMOTE(data, N, k):
+    """
+    Returns (N/100) * n_minority_samples synthetic minority samples.
+    https://github.com/asntech/kdd2008/blob/master/smote.py
+
+    Parameters
+    ----------
+    T : array-like, shape = [n_minority_samples, n_features]
+        Holds the minority samples
+    N : percetange of new synthetic samples:
+        n_synthetic_samples = N/100 * n_minority_samples. Can be < 100.
+    k : int. Number of nearest neighbours.
+    Returns
+    -------
+    S : array, shape = [(N/100) * n_minority_samples, n_features]
+    """
+
+    from random import randrange, choice
+    from sklearn.neighbors import NearestNeighbors
+
+
+    T = data
+
+    n_minority_samples, n_features = T.shape
+    
+    if N < 100:
+        #create synthetic samples only for a subset of T.
+        #TODO: select random minortiy samples
+        N = 100
+        pass
+
+    if (N % 100) != 0:
+        raise ValueError("N must be < 100 or multiple of 100")
+
+    N = N/100
+    n_synthetic_samples = N * n_minority_samples
+    S = np.zeros(shape=(n_synthetic_samples, n_features))
+
+    #Learn nearest neighbours
+    neigh = NearestNeighbors(n_neighbors = k)
+    neigh.fit(T)
+
+    #Calculate synthetic samples
+    for i in xrange(n_minority_samples):
+        nn = neigh.kneighbors(T[i], return_distance=False)
+        for n in xrange(N):
+            nn_index = choice(nn[0])
+            #NOTE: nn includes T[i], we don't want to select it
+            while nn_index == i:
+                nn_index = choice(nn[0])
+
+            dif = T[nn_index] - T[i]
+            gap = np.random.random()
+            S[n + i * N, :] = T[i,:] + gap * dif[:]
+
+    return S
+
+def downsample(train_df):
+    indices = np.where(train_df.Class == 'TE')[0]
+    rng = np.random.RandomState(13)
+    rng.shuffle(indices)
+    n_pos = (train_df.Class == 'SE').sum()
+    train_df = train_df.drop(train_df.index[indices[n_pos:]])
+
+    return train_df
 
 #get model     
-def get_model(model='rf'):
+def get_model(model, options):
     '''
     Get the model from six stat-of-the-art machine learning models.
     '''
+    if options.depth:
+       max_depth = int(options.depth)
+    else:
+        max_depth = None
+
     if model=='svm':
         from sklearn.svm import SVC
         names = ["Linear SVM"]
@@ -154,7 +286,7 @@ def get_model(model='rf'):
         
         names = ["Random Forest", "Linear SVM", "AdaBoost", "K-Nearest Neighbors", "Naive Bayes", "Decision Tree"]
         classifiers = [
-        RandomForestClassifier(max_depth=5, n_estimators=20),
+        RandomForestClassifier(max_depth=max_depth,n_estimators=int(options.estimator)),
         SVC(kernel='linear', probability=True),  
         AdaBoostClassifier(),
         KNeighborsClassifier(4),
@@ -164,18 +296,18 @@ def get_model(model='rf'):
         from sklearn.ensemble import RandomForestClassifier
         names = ["Random Forest"]
         classifiers = [
-        RandomForestClassifier(max_depth=5, n_estimators=20)
+        RandomForestClassifier(max_depth=max_depth,n_estimators=int(options.estimator))
         ]
     
     return names, classifiers
 
 # Classification and ROC analysis
-def claf_roc(X,y, Clabel, classifier, count, feature_comb, options):
+def claf_roc(X,y, Clabel, classifier, count, feature_comb, options, test_set=None):
     '''
     Train the model and test it using CV and draw the ROC plot.
     '''
-    X, y = X[y != 2], y[y != 2]
-    n_samples, n_features = X.shape
+    #X, y = X[y != 2], y[y != 2]
+    #n_samples, n_features = X.shape
     
     # Run classifier with cross-validation and plot ROC curves
     cv = StratifiedKFold(y, n_folds=options.cv)
@@ -187,9 +319,16 @@ def claf_roc(X,y, Clabel, classifier, count, feature_comb, options):
     #all_tpr = []
    
     if options.test:
-        test_df = pd.read_csv(options.input)
+        test_df = pd.read_csv(test_set)
+        
+        #perform down sampling
+        test_df = downsample(test_df)
+
         imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
         test_X = test_df[feature_comb].values
+
+        imp.fit(test_X)
+        imp.transform(test_X)
 
         test_yy = test_df["Class"].values
 
@@ -197,8 +336,6 @@ def claf_roc(X,y, Clabel, classifier, count, feature_comb, options):
         test_y[test_yy == 'SE'] = 1
         test_y[test_yy == 'TE'] = 0
 
-        #imp.fit(test_X)
-        #imp.transform(test_X)
         
         print "Testing the model using feature set "+Clabel
         probas_ = classifier.fit(X, y).predict_proba(test_X)
@@ -260,6 +397,95 @@ def claf_roc(X,y, Clabel, classifier, count, feature_comb, options):
        
     return mean_auc, np.mean(mean_recall), np.mean(mean_precision), np.mean(mean_prc)
 
+
+def model_compare(X,y, names,classifiers,output_dir,options):
+    X, y = X[y != 2], y[y != 2]
+    #n_samples, n_features = X.shape 
+    # Divide the data into folds
+
+    file_name = str(output_dir)+"/Improse_model_compare_results.txt"
+    file_out_stat = open(file_name,'w')
+    out_string =  "These results are generated using Improse version 1.0 on "+str(datetime.datetime.now())+"\nRead more about Improse at https://github.com/asntech/improse\n"
+    file_out_stat.write(out_string)
+
+    cv = StratifiedKFold(y, n_folds=int(options.cv))
+    
+    out_string =  "\n\nComparing models with "+str(options.cv)+"-fold cross-validation\n"
+    file_out_stat.write(out_string)
+
+    out_string = "\t".join(['Model', 'Precision',"Recall", "F1-score", "AUC", "PRC"]) + "\n"
+    file_out_stat.write(out_string)
+    # iterate over classifiers
+    for name, clf in zip(names, classifiers):
+        print "Running classifier "+name 
+        mean_tpr = 0.0
+        mean_precision = []
+        mean_recall = []
+        mean_pr = []
+        mean_fpr = np.linspace(0, 1, 100)
+        #all_tpr = []
+        
+        # Run each classifier with 10-fold stratified cross-validation   
+        for i, (train, test) in enumerate(cv):
+            #print "------> Cross validation for classifier "+name 
+            probas_ = clf.fit(X[train], y[train]).predict_proba(X[test])
+        
+           # Compute ROC curve and area the curve
+            fpr, tpr, thresholds = roc_curve(y[test], probas_[:, 1])
+            
+            # Compute Precision-Recall and plot curve
+            precision, recall, thresh = precision_recall_curve(y[test], probas_[:, 1])
+            mean_precision.append(np.mean(precision))
+            mean_recall.append(np.mean(recall))
+            area = auc(recall, precision)
+            mean_pr.append(area)
+            
+            mean_tpr += interp(mean_fpr, fpr, tpr)
+            mean_tpr[0] = 0.0
+            #roc_auc = auc(fpr, tpr)
+                   
+            #pl.plot(fpr, tpr, lw=2, label= Clabel +' = %0.2f' % roc_auc)
+        
+        #print ((np.mean(mean_precision)*np.mean(mean_recall))/((np.mean(mean_precision)+np.mean(mean_recall))
+              
+        # Plot the decision boundaries
+       
+        #pl.plot([1, 0], [0, 1], '--', color=(0.6, 0.6, 0.6), lw=0.5)
+        #pl.plot(recall, precision, label= name +' = %0.2f' % area, lw=1.5)
+        
+        mean_tpr /= len(cv)
+        mean_tpr[-1] = 1.0
+        mean_auc = auc(mean_fpr, mean_tpr)
+        
+        pl.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), lw=0.5)
+        pl.plot(mean_fpr, mean_tpr, label= name +' (%0.2f)' % mean_auc, lw=1.5)
+
+        f1s = 2*((np.mean(mean_precision)*np.mean(mean_recall)) / (np.mean(mean_precision)+np.mean(mean_recall)))
+        
+        #print("AUC Curve : %0.2f" % mean_auc)
+        out_string = "\t".join([str(name),str(float(np.round(np.mean(mean_precision),2))), str(float(np.round(np.mean(mean_recall),2))), str(float(np.round(f1s,2))), str(float(np.round(mean_auc,2))),  str(float(np.round(np.mean(mean_pr),2)))]) + "\n"
+        file_out_stat.write(out_string)
+               
+    #'ROC for all features with 10-fold CV'
+    pl.xlim([0.0, 1.0])
+    pl.ylim([0.0, 1.0])
+    pl.xlabel('False Positive Rate (1-Specificity)')
+    pl.ylabel('True Positive Rate (Sensitivity)')
+    pl.title("Model comparision")
+    pl.legend(fancybox=True, frameon=False, loc="lower right")
+    #pl.legend(frameon=False, loc="lower right")
+
+    #pl.xlabel('Recall')
+    #pl.ylabel('Precision')
+    #pl.title('Precision-Recall Curve')
+    #pl.legend(fancybox=True, fontsize='medium', loc="lower left")
+
+    #pl.show()
+    #pl.savefig('fig/'+clf_name+'.eps', format='eps', dpi=1000)
+    pl.savefig(output_dir+'/model_comparision.pdf', format='pdf', dpi=300)
+    #pl.savefig('fig/'+heading+'.png', format='png', dpi=300)
+
+
 def run_test(feature_list,classifiers,names,output_dir, options, sampling, feature_compare=False):
     '''
     Run on the training data and test the models using 10-fold cross-validation or test set.
@@ -292,7 +518,35 @@ def run_test(feature_list,classifiers,names,output_dir, options, sampling, featu
         out_string = "\t".join(['Features', 'Precision',"Recall", "F1-score", "AUC", "PRC"]) + "\n"
         file_out_stat.write(out_string)
 
-        if feature_compare:
+        if feature_compare and options.test:
+            #if list contains another list
+            if any(isinstance(el, list) for el in feature_list):
+                feature_list = sum(feature_list, [])        
+            #features_lable = '+'.join(feature_list)
+
+            X, y = get_data(feature_list, sampling, options.feature)
+
+            test_sets = options.input.split(',')
+
+            for test_set in test_sets:
+
+                features_lable = str(str(test_set).split('.')[0])
+
+                roc, rc, pr, prc = claf_roc(X,y, features_lable, clf, count, feature_list, options, test_set)                
+                roc_score.append(np.round(roc,2))
+                recall.append(np.round(rc,2))
+                precision.append(np.round(pr,2))
+                pr_curve.append(np.round(prc,2))
+                
+                f1s = 2*((pr*rc) / (pr+rc))
+                f1_score.append(np.round(f1s,2))
+                #pl.grid(linestyle='--', lw=0.04)
+               #draw ROC CURVE
+                out_string = "\t".join([str(features_lable),str(float(np.round(pr,2))), str(float(np.round(rc,2))), str(float(np.round(f1s,2))), str(float(np.round(roc,2))),  str(float(np.round(prc,2)))]) + "\n"
+                file_out_stat.write(out_string)
+                count = count+1
+        
+        elif feature_compare:
             for feature_comb in feature_list:
                 X, y = get_data(feature_comb, sampling, options.feature)
                 #X = recursive_feature_selection(X,y)
@@ -334,7 +588,7 @@ def run_test(feature_list,classifiers,names,output_dir, options, sampling, featu
             pr_curve.append(np.round(prc,2))
             
             f1s = 2*((pr*rc) / (pr+rc))
-            f1_score.append(np.round(f1s,2))
+            f1_score.append(np.round(f1s,3))
             #pl.grid(linestyle='--', lw=0.04)
             #draw ROC CURVE
             out_string = "\t".join([features_lable,str(float(np.round(pr,2))), str(float(np.round(rc,2))), str(float(np.round(f1s,2))), str(float(np.round(roc,2))),  str(float(np.round(prc,2)))]) + "\n"
@@ -359,7 +613,7 @@ def run_test(feature_list,classifiers,names,output_dir, options, sampling, featu
         pl.close()
 
 
-def make_prediction(X, y, feature_list, input_file, names, classifiers, output_dir):
+def make_prediction(X, y, feature_list, input_file, names, classifiers, output_dir, prob=0.5):
     '''
     Make prediction on the test data
     '''
@@ -387,8 +641,8 @@ def make_prediction(X, y, feature_list, input_file, names, classifiers, output_d
         test_df["Probability"] = pd.Series(pred_prob[:,1])
     
         pred_class = np.zeros(len(test_X))
-        pred_class[pred_prob[:,1] >= 0.5 ] = 1
-        pred_class[pred_prob[:,1] < 0.5 ] = 0
+        pred_class[pred_prob[:,1] >= prob ] = 1
+        pred_class[pred_prob[:,1] < prob ] = 0
 
         test_df["Class"] = pd.Series(pred_class)
 
@@ -399,29 +653,30 @@ def main():
     This is main function for Improse - Integrated Methods for Prediction of Super-Enhancers
     '''
     usage = """
-    Welcome to Improse - Integrated Methods for Prediction of Super-Enhancers
+    improse [options]
 
-    Run demo example with 10-fold cross-validation using:
+    To run example with default parameters type:
 
         %s --demo
 
     Read more about Improse https://github.com/asntech/improse
-
     """ % sys.argv[0]
-    
     parser = OptionParser(usage = usage)    
     #The following parameters are required to run the program. 
     parser.add_option("--demo", dest="demo", action='store_true',
                     help = "Run Demo using Random Forest on mESC data with 10-fold cross-validation. \nYou can set --model all, if you want to run the test on all six models. Note: This will take few minutes.")
-
     parser.add_option("-m","--model", dest="model", nargs = 1, type=str, default="rf",
-                    help = "Select model name. [rf, svm, knn, ab, dt, bn, all] (Default=rf)")
+                    help = "Select model. [rf, svm, knn, ab, dt, bn, all] (default=rf)")
 
-    parser.add_option("-f","--feature", dest="feature", nargs = 1,  type=str, default="all",
-                    help = "Select features of features type to train the model and make predictions. Feature names should be comma separated. \nIf you are want to check the combinatorial predictive power of features, separate them using + sypbol.\n[H3K27ac,Brd4all, chromatin, tf, genomic]. (Default=all)")
+    parser.add_option("-f","--feature", dest="feature", nargs = 1,  type=str, default=None,
+                    help = "Select features of features type to train the model and make predictions. Feature names should be comma separated. \nIf you are want to check the combinatorial predictive power of features, separate them using + sypbol.\n[H3K27ac,Brd4 or Chromatin,TFs etc ]. (Default=all)")
     
     parser.add_option("--compare", dest="compare", action='store_true',
                     help = "Compare the listed features in one ROC plot.")
+
+    parser.add_option("--mcomp", dest="model_compare", action='store_true',
+                    help = "Compare the model in one ROC plot.")
+    
     
     parser.add_option("-i","--input", dest="input", nargs = 1, type=str, default=None,
                     help = "Input file to use as test data or to make predictions. Please provide a CSV file with computed features and a 'Class' label if its test data.")
@@ -432,11 +687,14 @@ def main():
     parser.add_option("-p","--pred", dest="pred", action='store_true',
                     help = "Set if input file is for prediction.")
 
+    parser.add_option("--prob", dest="probability", nargs=1, type=float, default=0.5,
+                    help = "Set the probability cutoff (default=0.5).")
+
     parser.add_option("-c","--cv", nargs = 1, type=int, default=10,
                     help = "Set Cross-validation folds. (default=10)")
 
-    parser.add_option("-s","--sampling", nargs = 1, type=str, default="down",
-                    help = "Data sampling. [down=Downsampling, up=SMOTE]")
+    parser.add_option("-s","--sampling", nargs = 1, type=str, default="hybrid",
+                    help = "Data sampling. [down=Downsampling, up=SMOTE],hybrid=SMOTE+Down]. (default=hybrid)")
 
     parser.add_option("-o","--output",  nargs = 1, type=str, default=None,
                     help = "Enter output folder path. By default results will be saved in the current working directory.")    
@@ -444,14 +702,28 @@ def main():
     parser.add_option("--figuretype", dest="figuretype", nargs = 1, type=str, default="pdf",
                     help = "Figure type [pdf, eps, jpg, png] (default=pdf)")
 
+    parser.add_option("-e","--estimator", nargs = 1, type=int, default=20,
+                    help = "The number of trees in the Random Forest. (default=20)")
+
+    parser.add_option("-d","--depth", nargs = 1, type=int,
+                    help = "The maximum depth of the Random Forest tree. (default=None)")
+
     parser.add_option("--dpi", dest="dpi", nargs = 1, type=int, default=300,
                     help = "DPI(Dots per inch) of figure. (default=300)")
+
+    parser.add_option("-v","--version", dest="version", action='store_true',
+                    help = "Print version and exit.")
+
     #parser.add_argument('--version', action='version', version='%(prog)s 1.0')
 
     #checking the parameters
     (options,args) = parser.parse_args()
 
-    if not options.pred and not options.test and not options.demo:
+    if options.version:
+        print "Improse version "+__version__ 
+        exit()
+
+    if not options.pred and not options.test and not options.demo and not options.model_compare:
         parser.print_help()
         sys.exit(1)
 
@@ -471,44 +743,53 @@ def main():
 
     feature_list = []
     if options.feature == None:
-        feature_list = [["chromatin"],["tf"], ["genomic"],["all"]]
-    
-    elif options.feature == 'chromatin' or options.feature == 'tf' or options.feature == 'genomic' or options.feature == 'all':
+        feature_list = [["Chromatin"],["TFs"], ["DNA Sequence"],["All"]]
+        #feature_list = [["Imbalance"],["Undersampling"], ["Oversampling"],["Hybrid sampling"]]
+        #feature_list = [["HMs"],["CRs"],["Mediator"], ["Coactivators"], ["Cohesion"], ["Lsd1-NuRD"],["P-TFEb"],["Pol II"], ["DNaseI"],["TFs"], ["Motif"],["DNA Sequence"]]
+
+    #elif options.feature == 'chromatin' or options.feature == 'tf' or options.feature == 'genomic' or options.feature == 'all':
         
-        feature_list.append(options.feature)
+     #   feature_list.append(options.feature)
 
     else:
         features = options.feature.split(',')
         #feature_list = list(feature_list)
         for feature in features:
-            if feature.split("+"):
-               feature_list.append(feature.split("+"))
-            else:
-                feature_list.append(feature)
+            #if len(feature.split("+")) > 1:
+                #print feature
+                #exit()
+            feature_list.append(feature.split("+"))
+            #else:
+             #   feature_list.append(feature)
         print feature_list
         #exit()
+   
+    #Get model
+    names, classifiers = get_model(options.model, options)
 
-    if options.model:
-        names, classifiers = get_model(options.model)
-    else:
-        names, classifiers = get_model('rf')
+    if options.model_compare:
+        feature_list = sum(feature_list, [])
+        print feature_list
+        X, y = get_data(feature_list, sampling, options.feature)
+        model_compare(X,y, names,classifiers,output_dir,options)
 
-    if options.demo:
+    elif options.demo:
 
         run_test(feature_list,classifiers,names,output_dir, options, sampling, feature_compare)
 
     elif options.input:
         print('Preaparing the data...')
+        
         feature_list = sum(feature_list, [])
         X, y = get_data(feature_list, sampling, options.feature)
 
-        if not os.path.exists(options.input):
+        if  os.path.exists(options.input):
             print("\nThe input file does not exit. Please check it again.")
             #exit()
         else:
             if options.pred:
                 print('\nTraining the model and making predictions')
-                make_prediction(X, y, feature_list, options.input , names, classifiers, output_dir);
+                make_prediction(X, y, feature_list, options.input , names, classifiers, output_dir, options.probability);
             elif options.test:
                 print('\nTraining the model and testing it using provided data')
                 run_test(feature_list,classifiers,names,output_dir, options, sampling, feature_compare)
