@@ -1,6 +1,6 @@
 Introduction
 ============
-imPROSE is a supervised machine learning approach to predict super-enhancers or constituents of super-enhancers from a list of candidate enhancers. imPROSE integrated diverse features including DNase I hypersensitivity (DNaseI), histone modifications (HMs), cofactors, transcription factors (TFs) and DNA sequence specific features.
+imPROSE (integrated methods for prediction of super-enhancers) is a computational model to predict super-enhancers or constituents of super-enhancers from a list of candidate enhancers. imPROSE integrates diverse types of data including DNase I hypersensitivity (DNaseI), histone modifications (HMs), cofactors, transcription factors (TFs) and DNA sequence.
 
 imPROSE comes with six state-of-the-art machine learning models including Random Forest (RF), Support Vector Machines (SVM), K-Nearest Neighbor (kNN), AdaBoost (AB), Decision Tree (DT) and Naive Bayes (NB).
 
