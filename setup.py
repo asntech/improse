@@ -17,7 +17,7 @@ from setuptools import find_packages
 #from improse import __version__
 
 #VERSION = __import__("improse").__version__
-VERSION = '1.0'
+VERSION = '1.1'
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
