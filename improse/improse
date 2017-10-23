@@ -333,7 +333,7 @@ def claf_roc(X,y, Clabel, classifier, count, feature_comb, options, test_set=Non
         test_y[test_yy == 'TE'] = 0
 
         
-        print "Testing the model using feature set "+Clabel
+        print("Testing the model using feature set "+Clabel)
         probas_ = classifier.fit(X, y).predict_proba(test_X)
         #clr.predict_proba(X_test)[:, 1]
  
@@ -359,7 +359,7 @@ def claf_roc(X,y, Clabel, classifier, count, feature_comb, options, test_set=Non
 
         for i, (train, test) in enumerate(cv):
             
-            print "Fold-"+str(i+1)+" for feature set "+Clabel
+            print("Fold-"+str(i+1)+" for feature set "+Clabel)
             probas_ = classifier.fit(X[train], y[train]).predict_proba(X[test])
             #clr.predict_proba(X_test)[:, 1]
      
@@ -413,7 +413,7 @@ def model_compare(X,y, names,classifiers,output_dir,options):
     file_out_stat.write(out_string)
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
-        print "Running classifier "+name 
+        print("Running classifier "+name)
         mean_tpr = 0.0
         mean_precision = []
         mean_recall = []
@@ -495,9 +495,9 @@ def run_test(feature_list,classifiers,names,output_dir, options, sampling, featu
 
         clf_name = name
         if options.test:
-            print "\nTraining "+clf_name
+            print("\nTraining "+clf_name)
         else:
-            print "\nRunning "+clf_name+" with "+str(options.cv)+"-fold cross-validation..."
+            print("\nRunning "+clf_name+" with "+str(options.cv)+"-fold cross-validation...")
         roc_score = []
         recall = []
         precision = []
@@ -627,7 +627,7 @@ def make_prediction(X, y, feature_list, input_file, names, classifiers, output_d
 
     for name, clf in zip(names, classifiers):
         
-        print "Training and predicting usind "+name+"..."
+        print("Training and predicting usind "+name+"...")
         
         clf = clf.fit(X,y)
 
@@ -716,7 +716,7 @@ def main():
     (options,args) = parser.parse_args()
 
     if options.version:
-        print "Improse version "+__version__ 
+        print("Improse version "+__version__)
         exit()
 
     if not options.pred and not options.test and not options.demo and not options.model_compare:
@@ -757,7 +757,7 @@ def main():
             feature_list.append(feature.split("+"))
             #else:
              #   feature_list.append(feature)
-        print feature_list
+        print(feature_list)
         #exit()
    
     #Get model
@@ -765,7 +765,7 @@ def main():
 
     if options.model_compare:
         feature_list = sum(feature_list, [])
-        print feature_list
+        print(feature_list)
         X, y = get_data(feature_list, sampling, options.feature)
         model_compare(X,y, names,classifiers,output_dir,options)
 
@@ -799,7 +799,7 @@ def main():
         parser.print_help()
         exit()
 
-    print '\nYou are done! Please check your results @ '+output_dir+'. \nThank you for using Improse!\n'
+    print('\nYou are done! Please check your results @ '+output_dir+'. \nThank you for using Improse!\n')
 
 if __name__ == '__main__':
     try:

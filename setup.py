@@ -17,7 +17,7 @@ from setuptools import find_packages
 #from improse import __version__
 
 #VERSION = __import__("improse").__version__
-VERSION = '1.1'
+VERSION = '1.2'
 
 CLASSIFIERS = [
     'Intended Audience :: Developers',
@@ -42,7 +42,7 @@ setup(
     version=VERSION,
     author="Aziz Khan",
     #Keywords= "bioinformatics,genomics",
-    author_email="khana10@mails.tsinghua.edu.cn",
+    author_email="azez.khan@gmail.com",
     url="https://github.com/asntech/improse",
     package_dir={'improse': 'improse'},
     packages=['improse'],

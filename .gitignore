@@ -8,6 +8,7 @@ __pycache__/
 env/
 
 build/
+src/
 develop-eggs/
 dist/
 downloads/
@@ -30,8 +31,9 @@ var/
 
 
 # Sphinx documentation
-docs_source/
 docs/_build/
+docs/_static/
+docs/_template/
 
 
 
