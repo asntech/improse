@@ -121,7 +121,3 @@ This will save the predictions results as CSV file ``Improse_[MODEL_NAME]_predic
 Support
 ========
 If you have questions, or found any bug in the program, please write to us at ``aziz.khan[at]ncmm.uio.no``
-
-Cite Us
-=========
-If you use imPROSE please cite us: 
